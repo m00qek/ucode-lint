@@ -1,0 +1,8 @@
+id: no-eval
+language: ucode
+severity: error
+message: >
+  `eval()` executes arbitrary ucode and is a security risk.
+  Refactor to avoid dynamic code execution.
+rule:
+  pattern: eval($$$ARGS)

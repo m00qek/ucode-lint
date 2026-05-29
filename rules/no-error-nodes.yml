@@ -1,0 +1,9 @@
+id: no-error-nodes
+language: ucode
+severity: error
+message: >
+  Syntax error: this construct is not valid ucode.
+  Common causes: `var`, `new`, `throw`, `typeof`, `class`, destructuring,
+  `for...of`, `async`/`await`, or `>>>`.
+rule:
+  kind: ERROR

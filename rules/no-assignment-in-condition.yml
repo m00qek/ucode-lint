@@ -1,0 +1,9 @@
+id: no-assignment-in-condition
+language: ucode
+severity: error
+message: >
+  Assignment inside a condition is almost certainly a bug. Did you mean `===`?
+rule:
+  any:
+    - pattern: if ($X = $Y) $BODY
+    - pattern: while ($X = $Y) $BODY

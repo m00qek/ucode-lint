@@ -1,0 +1,13 @@
+id: no-unsafe-shell
+language: ucode
+severity: error
+message: >
+  Shell command constructed with dynamic content. If any part of the command
+  comes from user input or external data, this is a command injection risk.
+  Use array form or sanitize inputs explicitly.
+rule:
+  any:
+    - pattern: popen(`$$$`)
+    - pattern: popen($A + $B)
+    - pattern: system(`$$$`)
+    - pattern: system($A + $B)

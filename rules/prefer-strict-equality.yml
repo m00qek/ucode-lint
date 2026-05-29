@@ -1,0 +1,10 @@
+id: prefer-strict-equality
+language: ucode
+severity: warning
+message: >
+  Use `===` / `!==` instead of `==` / `!=`.
+  Loose equality does type coercion and is almost never what you want in ucode.
+rule:
+  any:
+    - pattern: $A == $B
+    - pattern: $A != $B

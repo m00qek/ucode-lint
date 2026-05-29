@@ -24,7 +24,11 @@ npx ucode-lint              # lint current directory
 
 | ID | Severity | Category | Description |
 |----|----------|----------|-------------|
-| (none yet — Phase 2a) | | | |
+| `no-error-nodes` | error | Removed JS syntax | Flags any construct ucode cannot parse: `var`, `new`, `throw`, `typeof`, `class`, destructuring, `for...of`, `async`/`await`, `>>>` |
+| `no-assignment-in-condition` | error | Common bugs | Assignment inside `if`/`while` condition — almost always `===` was intended |
+| `no-eval` | error | Security | `eval()` executes arbitrary code |
+| `no-unsafe-shell` | error | Security | `popen()`/`system()` called with a template literal or string concatenation — command injection risk |
+| `prefer-strict-equality` | warning | Common bugs | `==` / `!=` — use `===` / `!==` to avoid type coercion |
 
 ## Supported platforms
 
