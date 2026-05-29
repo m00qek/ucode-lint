@@ -29,6 +29,8 @@ npx ucode-lint              # lint current directory
 | `no-eval` | error | Security | `eval()` executes arbitrary code |
 | `no-unsafe-shell` | error | Security | `popen()`/`system()` called with a template literal or string concatenation — command injection risk |
 | `prefer-strict-equality` | warning | Common bugs | `==` / `!=` — use `===` / `!==` to avoid type coercion |
+| `no-optional-chain` | warning | Ucode-specific | `?.` short-circuits on ANY non-object (strings, numbers, booleans) — not just null. Use explicit null checks |
+| `no-alt-block-syntax` | warning | Style | Prefer `{}` blocks over `if/endif`, `for/endfor`, `while/endwhile`, `function/endfunction` |
 
 ## Supported platforms
 

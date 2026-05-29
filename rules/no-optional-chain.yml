@@ -1,0 +1,13 @@
+id: no-optional-chain
+language: ucode
+severity: warning
+message: >
+  Avoid optional chaining (`?.`) in ucode. Unlike JavaScript, `?.` short-circuits
+  to `null` for ANY non-object value — including strings, numbers, and booleans —
+  not just for `null`. Use an explicit null check instead:
+  `obj != null ? obj.prop : null`.
+rule:
+  any:
+    - pattern: $OBJ?.$PROP
+    - pattern: $OBJ?.[$IDX]
+    - pattern: $FN?.($$$ARGS)

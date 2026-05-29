@@ -1,0 +1,15 @@
+id: no-alt-block-syntax
+language: ucode
+severity: warning
+message: >
+  Prefer brace-delimited blocks over the alternative `end*` syntax.
+  Mixing both styles in a codebase reduces readability.
+  Use `if (...) { }` instead of `if (...): ... endif`,
+  `for (...) { }` instead of `for (...): ... endfor`, etc.
+rule:
+  any:
+    - kind: if_alt_statement
+    - kind: for_alt_statement
+    - kind: for_in_alt_statement
+    - kind: while_alt_statement
+    - pattern: function $NAME($$$PARAMS): $$$BODY endfunction
