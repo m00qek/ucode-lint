@@ -1,0 +1,31 @@
+{
+  "name": "ucode-lint",
+  "version": "0.1.0",
+  "description": "Lint rules for ucode, the OpenWrt scripting language",
+  "repository": "https://github.com/m00qek/ucode-lint",
+  "license": "MIT",
+  "bin": {
+    "ucode-lint": "bin/ucode-lint"
+  },
+  "files": [
+    "bin/ucode-lint",
+    "rules/*.yml",
+    "sgconfig.yml"
+  ],
+  "dependencies": {
+    "tree-sitter-ucode": "^0.1.0"
+  },
+  "optionalDependencies": {
+    "@ast-grep/napi-linux-x64-gnu":   "0.43.0",
+    "@ast-grep/napi-linux-x64-musl":  "0.43.0",
+    "@ast-grep/napi-linux-arm64-gnu": "0.43.0",
+    "@ast-grep/napi-linux-arm64-musl": "0.43.0",
+    "@ast-grep/napi-darwin-x64":      "0.43.0",
+    "@ast-grep/napi-darwin-arm64":    "0.43.0",
+    "@ast-grep/napi-win32-x64-msvc":  "0.43.0",
+    "@ast-grep/napi-win32-arm64-msvc": "0.43.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

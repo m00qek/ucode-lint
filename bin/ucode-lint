@@ -1,0 +1,26 @@
+#!/usr/bin/env node
+'use strict';
+
+// Thin wrapper: loads @ast-grep/napi, registers the ucode grammar from
+// tree-sitter-ucode, then runs sgconfig.yml against the provided paths.
+//
+// Usage: ucode-lint [paths...]  (defaults to current directory)
+
+const path = require('node:path');
+
+let sg;
+try {
+  sg = require('@ast-grep/napi');
+} catch {
+  console.error(
+    'ucode-lint: could not load @ast-grep/napi — ' +
+    'your platform may not have a prebuilt binary.\n' +
+    'See https://github.com/m00qek/ucode-lint for supported platforms.'
+  );
+  process.exit(1);
+}
+
+// TODO (Phase 2a): register the ucode grammar and run rules.
+// This stub exits cleanly so the package scaffold is testable end-to-end.
+console.log('ucode-lint: not yet implemented');
+process.exit(0);
