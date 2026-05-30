@@ -138,6 +138,11 @@ test('no-unsafe-system: does not flag array literal (safe argv form)', () => {
   );
 });
 
+test('no-unsafe-system: flags string concatenation', () => {
+  const { matcher } = loadRule('no-unsafe-system');
+  assert.ok(lint('system("rm -rf " + path);', matcher).length > 0, 'string concatenation must be flagged');
+});
+
 // ---------------------------------------------------------------------------
 // no-assignment-in-condition
 // ---------------------------------------------------------------------------
@@ -170,6 +175,21 @@ test('no-assignment-in-condition: flags assignment in ternary condition', () => 
 test('no-assignment-in-condition: passes normal ternary with no assignment', () => {
   const { matcher } = loadRule('no-assignment-in-condition');
   assert.equal(lint('let r = x > 0 ? a : b;', matcher).length, 0);
+});
+
+test('no-assignment-in-condition: flags assignment in for-loop condition', () => {
+  const { matcher } = loadRule('no-assignment-in-condition');
+  assert.ok(lint('for (let i = 0; i = getNext(); i++) {}', matcher).length > 0, 'for-condition assignment must be flagged');
+});
+
+test('no-assignment-in-condition: passes assignment in for-loop initializer', () => {
+  const { matcher } = loadRule('no-assignment-in-condition');
+  assert.equal(lint('for (let i = 0; i < 10; i++) {}', matcher).length, 0);
+});
+
+test('no-assignment-in-condition: passes assignment in for-loop body', () => {
+  const { matcher } = loadRule('no-assignment-in-condition');
+  assert.equal(lint('for (let i = 0; i < 10; i++) { x = 1; }', matcher).length, 0);
 });
 
 // ---------------------------------------------------------------------------

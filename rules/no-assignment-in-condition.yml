@@ -8,3 +8,9 @@ rule:
     - pattern: if ($X = $Y) $BODY
     - pattern: while ($X = $Y) $BODY
     - pattern: "($X = $Y) ? $THEN : $ELSE"
+    - all:
+        - kind: assignment_expression
+        - inside:
+            kind: for_statement
+            field: condition
+            stopBy: neighbor

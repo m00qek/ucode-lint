@@ -25,7 +25,7 @@ npx ucode-lint              # lint current directory
 | ID | Severity | Category | Description |
 |----|----------|----------|-------------|
 | `no-error-nodes` | error | Removed JS syntax | Flags any construct ucode cannot parse: `var`, `new`, `throw`, `typeof`, `class`, destructuring, `for...of`, `async`/`await`, `>>>` |
-| `no-assignment-in-condition` | error | Common bugs | Assignment inside `if`/`while` condition — almost always `===` was intended |
+| `no-assignment-in-condition` | error | Common bugs | Assignment inside an `if`, `while`, `for`, or ternary condition — almost always `===` was intended |
 | `no-eval` | error | Security | `eval()` executes arbitrary code |
 | `no-unsafe-popen` | error | Security | `popen()` with a non-literal argument always runs the command through `/bin/sh`. `popen()` has no array form — sanitize inputs or replace with `system([...])` |
 | `no-unsafe-system` | error | Security | `system()` with a dynamic string argument runs the command through `/bin/sh`. Use the safe array form: `system(["/path/cmd", arg1, arg2])` bypasses the shell entirely |
