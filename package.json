@@ -2,6 +2,9 @@
   "name": "ucode-lint",
   "version": "0.1.0",
   "description": "Lint rules for ucode, the OpenWrt scripting language",
+  "keywords": ["ucode", "openwrt", "linter", "ast-grep", "static-analysis"],
+  "homepage": "https://github.com/m00qek/ucode-lint#readme",
+  "bugs": "https://github.com/m00qek/ucode-lint/issues",
   "repository": "https://github.com/m00qek/ucode-lint",
   "license": "MIT",
   "bin": {
@@ -13,7 +16,8 @@
   "files": [
     "bin/ucode-lint",
     "lib/parse-rule.js",
-    "rules/*.yml"
+    "rules/*.yml",
+    "LICENSE"
   ],
   "dependencies": {
     "@ast-grep/napi": "^0.43.0",

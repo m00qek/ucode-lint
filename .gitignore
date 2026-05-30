@@ -1,1 +1,22 @@
+# dependencies
 node_modules/
+
+# test coverage
+coverage/
+.nyc_output/
+
+# logs
+*.log
+npm-debug.log*
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# editors
+.vscode/
+.idea/
+*.swp
+*.swo
