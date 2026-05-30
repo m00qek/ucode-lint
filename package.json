@@ -7,14 +7,19 @@
   "bin": {
     "ucode-lint": "bin/ucode-lint"
   },
+  "scripts": {
+    "test": "node --test 'test/**/*.test.js'"
+  },
   "files": [
     "bin/ucode-lint",
+    "lib/parse-rule.js",
     "rules/*.yml",
     "sgconfig.yml"
   ],
   "dependencies": {
     "@ast-grep/napi": "^0.43.0",
-    "tree-sitter-ucode": "file:../tree-sitter-ucode"
+    "tree-sitter-ucode": "file:../tree-sitter-ucode",
+    "yaml": "^2.9.0"
   },
   "optionalDependencies": {
     "@ast-grep/napi-darwin-arm64": "0.43.0",

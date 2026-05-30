@@ -3,39 +3,18 @@
 
 const path = require('node:path');
 const fs   = require('node:fs');
+const { parseRule } = require('../lib/parse-rule');
 
-let sg;
-try {
-  sg = require('@ast-grep/napi');
-} catch {
-  console.error(
-    'ucode-lint: could not load @ast-grep/napi — ' +
-    'your platform may not have a prebuilt binary.\n' +
-    'See https://github.com/m00qek/ucode-lint for supported platforms.'
-  );
-  process.exit(1);
-}
+// ---------------------------------------------------------------------------
+// --help (before any I/O so a broken install still prints usage)
+// ---------------------------------------------------------------------------
 
-// Register the ucode grammar from tree-sitter-ucode
-const grammarDir = path.dirname(require.resolve('tree-sitter-ucode/package.json'));
-sg.registerDynamicLanguage({
-  ucode: {
-    libraryPath: path.join(grammarDir, 'ucode.so'),
-    extensions:  ['uc'],
-  },
-});
-
-// Load and parse rules from rules/ alongside this script
-const rulesDir = path.join(__dirname, '..', 'rules');
-const rules = fs.readdirSync(rulesDir)
-  .filter(f => f.endsWith('.yml'))
-  .map(f => parseRule(fs.readFileSync(path.join(rulesDir, f), 'utf8')))
-  .filter(Boolean);
-
-// Handle flags
 const args = process.argv.slice(2);
 
 if (args.includes('--help') || args.includes('-h')) {
+  const ruleNames = fs.readdirSync(path.join(__dirname, '..', 'rules'))
+    .filter(f => f.endsWith('.yml'))
+    .map(f => '  ' + f.slice(0, -4));
   console.log([
     'Usage: ucode-lint [paths...]',
     '',
@@ -49,32 +28,100 @@ if (args.includes('--help') || args.includes('-h')) {
     '  1   One or more errors found',
     '',
     'Rules:',
-    ...require('node:fs').readdirSync(path.join(__dirname, '..', 'rules'))
-      .filter(f => f.endsWith('.yml'))
-      .map(f => '  ' + f.replace('.yml', '')),
+    ...ruleNames,
   ].join('\n'));
   process.exit(0);
 }
 
-// Collect .uc files from the given paths (recursive)
+// ---------------------------------------------------------------------------
+// Load grammar
+// ---------------------------------------------------------------------------
+
+let sg;
+try {
+  sg = require('@ast-grep/napi');
+} catch {
+  console.error(
+    'ucode-lint: could not load @ast-grep/napi — ' +
+    'your platform may not have a prebuilt binary.\n' +
+    'See https://github.com/m00qek/ucode-lint for supported platforms.'
+  );
+  process.exit(1);
+}
+
+try {
+  const grammarDir = path.dirname(require.resolve('tree-sitter-ucode/package.json'));
+  sg.registerDynamicLanguage({
+    ucode: {
+      libraryPath: path.join(grammarDir, 'ucode.so'),
+      extensions:  ['uc'],
+    },
+  });
+} catch (err) {
+  console.error(
+    'ucode-lint: could not load the ucode grammar.\n' +
+    'Make sure tree-sitter-ucode is installed and the grammar has been built:\n' +
+    '  cd node_modules/tree-sitter-ucode && tree-sitter build\n' +
+    `Details: ${err.message}`
+  );
+  process.exit(1);
+}
+
+// ---------------------------------------------------------------------------
+// Load rules
+// ---------------------------------------------------------------------------
+
+const rulesDir = path.join(__dirname, '..', 'rules');
+const rules = fs.readdirSync(rulesDir)
+  .filter(f => f.endsWith('.yml'))
+  .map(f => parseRule(fs.readFileSync(path.join(rulesDir, f), 'utf8')))
+  .filter(Boolean);
+
+// ---------------------------------------------------------------------------
+// Collect files
+// ---------------------------------------------------------------------------
+
 const targets = args.filter(a => !a.startsWith('-'));
 if (targets.length === 0) targets.push('.');
 
-function collectFiles(target) {
-  const stat = fs.statSync(target);
-  if (stat.isFile())      return target.endsWith('.uc') ? [target] : [];
-  if (stat.isDirectory()) return fs.readdirSync(target, { withFileTypes: true })
-    .flatMap(e => collectFiles(path.join(target, e.name)));
+function collectFiles(target, visited = new Set()) {
+  let stat;
+  try {
+    stat = fs.statSync(target);
+  } catch (err) {
+    console.error(`ucode-lint: ${err.message}`);
+    return [];
+  }
+
+  if (stat.isFile()) return target.endsWith('.uc') ? [target] : [];
+
+  if (stat.isDirectory()) {
+    let realPath;
+    try {
+      realPath = fs.realpathSync(target);
+    } catch {
+      return [];
+    }
+    if (visited.has(realPath)) return [];
+    visited.add(realPath);
+
+    return fs.readdirSync(target, { withFileTypes: true })
+      .flatMap(e => collectFiles(path.join(target, e.name), visited));
+  }
+
   return [];
 }
 
-const files = targets.flatMap(collectFiles);
+const files = targets.flatMap(t => collectFiles(t));
 if (files.length === 0) {
   console.log('ucode-lint: no .uc files found');
   process.exit(0);
 }
 
-// Run every rule against every file
+// ---------------------------------------------------------------------------
+// Lint
+// ---------------------------------------------------------------------------
+
 let errorCount   = 0;
 let warningCount = 0;
 
@@ -105,38 +152,3 @@ console.log(
   `in ${files.length} file${files.length === 1 ? '' : 's'}.`
 );
 process.exit(errorCount > 0 ? 1 : 0);
-
-// ---------------------------------------------------------------------------
-
-function parseRule(yaml) {
-  const id       = (yaml.match(/^id:\s*(.+)$/m)       || [])[1]?.trim();
-  const severity = (yaml.match(/^severity:\s*(.+)$/m) || [])[1]?.trim() ?? 'error';
-  const rawMsg   = (yaml.match(/^message:\s*[>|]\n((?:[ \t].+\n?)+)/m) ||
-                    yaml.match(/^message:\s*(.+)$/m) || [])[1] ?? id;
-  const message  = rawMsg.replace(/\n\s*/g, ' ').trim();
-
-  const matcher = buildMatcher(yaml);
-  if (!matcher) return null;
-
-  return { id, severity, message, matcher };
-}
-
-function buildMatcher(yaml) {
-  // rule:\n  kind: FOO
-  const kind = (yaml.match(/^rule:\s*\n\s+kind:\s*(.+)$/m) || [])[1]?.trim();
-  if (kind) return { rule: { kind } };
-
-  // rule:\n  pattern: ...
-  const pattern = (yaml.match(/^rule:\s*\n\s+pattern:\s*(.+)$/m) || [])[1]?.trim();
-  if (pattern) return { rule: { pattern } };
-
-  // rule:\n  any:\n    - pattern: ...\n    - pattern: ...
-  const anyBlock = yaml.match(/^rule:\s*\n\s+any:\s*\n((?:\s+-\s+pattern:.+\n?)+)/m);
-  if (anyBlock) {
-    const patterns = [...anyBlock[1].matchAll(/\s+-\s+pattern:\s*(.+)/g)]
-      .map(m => ({ pattern: m[1].trim() }));
-    return { rule: { any: patterns } };
-  }
-
-  return null;
-}

@@ -7,7 +7,10 @@ message: >
   Use array form or sanitize inputs explicitly.
 rule:
   any:
-    - pattern: popen(`$$$`)
-    - pattern: popen($A + $B)
-    - pattern: system(`$$$`)
-    - pattern: system($A + $B)
+    - pattern: popen($CMD)
+    - pattern: popen($CMD, $MODE)
+    - pattern: system($CMD)
+constraints:
+  CMD:
+    not:
+      kind: string
