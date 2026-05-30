@@ -32,8 +32,32 @@ const rules = fs.readdirSync(rulesDir)
   .map(f => parseRule(fs.readFileSync(path.join(rulesDir, f), 'utf8')))
   .filter(Boolean);
 
+// Handle flags
+const args = process.argv.slice(2);
+
+if (args.includes('--help') || args.includes('-h')) {
+  console.log([
+    'Usage: ucode-lint [paths...]',
+    '',
+    '  Lint ucode source files for common errors, removed JS syntax,',
+    '  security issues, and style problems.',
+    '',
+    '  paths   Files or directories to lint (default: current directory)',
+    '',
+    'Exit codes:',
+    '  0   No errors (warnings may be present)',
+    '  1   One or more errors found',
+    '',
+    'Rules:',
+    ...require('node:fs').readdirSync(path.join(__dirname, '..', 'rules'))
+      .filter(f => f.endsWith('.yml'))
+      .map(f => '  ' + f.replace('.yml', '')),
+  ].join('\n'));
+  process.exit(0);
+}
+
 // Collect .uc files from the given paths (recursive)
-const targets = process.argv.slice(2);
+const targets = args.filter(a => !a.startsWith('-'));
 if (targets.length === 0) targets.push('.');
 
 function collectFiles(target) {
