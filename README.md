@@ -1,23 +1,42 @@
 # ucode-lint
 
-Lint rules for [ucode](https://github.com/jow-/ucode), the ECMAScript-like
-scripting language used in OpenWrt.
+Static linter for [ucode](https://github.com/jow-/ucode), the ECMAScript-like
+scripting language used in OpenWrt. Catches security vulnerabilities, common
+bugs, and ucode-specific pitfalls that standard JavaScript linters miss.
 
 Powered by [ast-grep](https://ast-grep.github.io) and
 [tree-sitter-ucode](https://github.com/m00qek/tree-sitter-ucode).
 
-## CI integration
+## Installation
 
-```yaml
-- run: npm install ucode-lint
-- run: npx ucode-lint
+```sh
+npm install --save-dev ucode-lint
 ```
 
 ## Usage
 
 ```sh
 npx ucode-lint [paths...]   # lint specific files or directories
-npx ucode-lint              # lint current directory
+npx ucode-lint              # lint current directory (default)
+```
+
+Example output:
+
+```
+src/handler.uc:12:5: [error] popen() always passes its argument through /bin/sh … (no-unsafe-popen)
+src/handler.uc:34:3: [warning] Use `===` / `!==` instead of `==` / `!=`. … (prefer-strict-equality)
+
+2 problems (1 error, 1 warning) in 1 file.
+```
+
+Exit code `0` if no errors are found (warnings do not affect the exit code).  
+Exit code `1` if one or more errors are found.
+
+## CI integration
+
+```yaml
+- run: npm install
+- run: npx ucode-lint
 ```
 
 ## Rules
@@ -25,12 +44,12 @@ npx ucode-lint              # lint current directory
 | ID | Severity | Category | Description |
 |----|----------|----------|-------------|
 | `no-error-nodes` | error | Removed JS syntax | Flags any construct ucode cannot parse: `var`, `new`, `throw`, `typeof`, `class`, destructuring, `for...of`, `async`/`await`, `>>>` |
-| `no-assignment-in-condition` | error | Common bugs | Assignment inside an `if`, `while`, `for`, or ternary condition — almost always `===` was intended |
+| `no-assignment-in-condition` | error | Common bugs | Assignment inside an `if`, `while`, `for`, or ternary condition — use `===` to compare, or move the assignment before the condition |
 | `no-eval` | error | Security | `eval()` executes arbitrary code |
-| `no-unsafe-popen` | error | Security | `popen()` with a non-literal argument always runs the command through `/bin/sh`. `popen()` has no array form — sanitize inputs or replace with `system([...])` |
-| `no-unsafe-system` | error | Security | `system()` with a dynamic string argument runs the command through `/bin/sh`. Use the safe array form: `system(["/path/cmd", arg1, arg2])` bypasses the shell entirely |
-| `prefer-strict-equality` | warning | Common bugs | `==` / `!=` — use `===` / `!==` to avoid type coercion |
-| `no-optional-chain` | warning | Ucode-specific | `?.` short-circuits on ANY non-object (strings, numbers, booleans) — not just null. Use explicit null checks |
+| `no-unsafe-popen` | error | Security | `popen()` always runs its argument through `/bin/sh` and has no array form — sanitize inputs or replace with `system([...])` |
+| `no-unsafe-system` | error | Security | `system()` with a dynamic string runs through `/bin/sh` — use the array form `system(["/cmd", arg1, arg2])` to bypass the shell entirely |
+| `prefer-strict-equality` | warning | Common bugs | `==` / `!=` do type coercion — use `===` / `!==` instead |
+| `no-optional-chain` | warning | Ucode-specific | `?.` short-circuits on ANY non-object value (strings, numbers, booleans), not just `null` — use explicit null checks |
 | `no-alt-block-syntax` | warning | Style | Prefer `{}` blocks over `if/endif`, `for/endfor`, `while/endwhile`, `function/endfunction` |
 
 ## Supported platforms

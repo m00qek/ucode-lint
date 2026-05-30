@@ -2,7 +2,8 @@ id: no-assignment-in-condition
 language: ucode
 severity: error
 message: >
-  Assignment inside a condition is almost certainly a bug. Did you mean `===`?
+  Assignment inside a condition is almost certainly a bug — use `===` to
+  compare, or move the assignment before the condition.
 rule:
   any:
     - pattern: if ($X = $Y) $BODY
