@@ -1,0 +1,16 @@
+id: no-unsafe-popen
+language: ucode
+severity: error
+message: >
+  popen() always passes its argument through /bin/sh — there is no array
+  form. If the command string contains any dynamic content, this is a
+  command-injection risk. Sanitize inputs, or replace with system() using
+  an argv array to avoid the shell entirely.
+rule:
+  any:
+    - pattern: popen($CMD)
+    - pattern: popen($CMD, $MODE)
+constraints:
+  CMD:
+    not:
+      kind: string

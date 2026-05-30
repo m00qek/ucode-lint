@@ -1,0 +1,16 @@
+id: no-unsafe-system
+language: ucode
+severity: error
+message: >
+  system() with a dynamic string argument passes commands through /bin/sh,
+  creating a command-injection risk. Use the array form instead:
+  system(["/path/to/cmd", arg1, arg2]) executes without a shell and is safe
+  even with untrusted arguments.
+rule:
+  pattern: system($CMD)
+constraints:
+  CMD:
+    not:
+      any:
+        - kind: string
+        - kind: array

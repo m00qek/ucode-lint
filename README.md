@@ -27,7 +27,8 @@ npx ucode-lint              # lint current directory
 | `no-error-nodes` | error | Removed JS syntax | Flags any construct ucode cannot parse: `var`, `new`, `throw`, `typeof`, `class`, destructuring, `for...of`, `async`/`await`, `>>>` |
 | `no-assignment-in-condition` | error | Common bugs | Assignment inside `if`/`while` condition — almost always `===` was intended |
 | `no-eval` | error | Security | `eval()` executes arbitrary code |
-| `no-unsafe-shell` | error | Security | `popen()`/`system()` called with a template literal or string concatenation — command injection risk |
+| `no-unsafe-popen` | error | Security | `popen()` with a non-literal argument always runs the command through `/bin/sh`. `popen()` has no array form — sanitize inputs or replace with `system([...])` |
+| `no-unsafe-system` | error | Security | `system()` with a dynamic string argument runs the command through `/bin/sh`. Use the safe array form: `system(["/path/cmd", arg1, arg2])` bypasses the shell entirely |
 | `prefer-strict-equality` | warning | Common bugs | `==` / `!=` — use `===` / `!==` to avoid type coercion |
 | `no-optional-chain` | warning | Ucode-specific | `?.` short-circuits on ANY non-object (strings, numbers, booleans) — not just null. Use explicit null checks |
 | `no-alt-block-syntax` | warning | Style | Prefer `{}` blocks over `if/endif`, `for/endfor`, `while/endwhile`, `function/endfunction` |

@@ -56,47 +56,71 @@ test('no-eval: does not flag other call expressions', () => {
 });
 
 // ---------------------------------------------------------------------------
-// no-unsafe-shell (enhanced: catches bare variables, not just concat/template)
+// no-unsafe-popen
+// popen() has no array form and always runs through /bin/sh
 // ---------------------------------------------------------------------------
 
-test('no-unsafe-shell: flags template literal in popen', () => {
-  const { matcher } = loadRule('no-unsafe-shell');
+test('no-unsafe-popen: flags template literal', () => {
+  const { matcher } = loadRule('no-unsafe-popen');
   assert.ok(lint('popen(`ls ${dir}`, "r");', matcher).length > 0);
 });
 
-test('no-unsafe-shell: flags concatenation in popen', () => {
-  const { matcher } = loadRule('no-unsafe-shell');
+test('no-unsafe-popen: flags concatenation', () => {
+  const { matcher } = loadRule('no-unsafe-popen');
   assert.ok(lint('popen("ls " + dir, "r");', matcher).length > 0);
 });
 
-test('no-unsafe-shell: flags bare variable in popen (one-arg form)', () => {
-  const { matcher } = loadRule('no-unsafe-shell');
+test('no-unsafe-popen: flags bare variable (one-arg form)', () => {
+  const { matcher } = loadRule('no-unsafe-popen');
   assert.ok(lint('popen(cmd);', matcher).length > 0, 'bare variable must be flagged');
 });
 
-test('no-unsafe-shell: flags bare variable in popen (two-arg form)', () => {
-  const { matcher } = loadRule('no-unsafe-shell');
+test('no-unsafe-popen: flags bare variable (two-arg form)', () => {
+  const { matcher } = loadRule('no-unsafe-popen');
   assert.ok(lint('popen(cmd, "r");', matcher).length > 0, 'bare variable + mode must be flagged');
 });
 
-test('no-unsafe-shell: flags function call result in popen', () => {
-  const { matcher } = loadRule('no-unsafe-shell');
+test('no-unsafe-popen: flags function call result', () => {
+  const { matcher } = loadRule('no-unsafe-popen');
   assert.ok(lint('popen(getCmd(), "r");', matcher).length > 0);
 });
 
-test('no-unsafe-shell: does not flag static string literal in popen', () => {
-  const { matcher } = loadRule('no-unsafe-shell');
+test('no-unsafe-popen: does not flag static string literal', () => {
+  const { matcher } = loadRule('no-unsafe-popen');
   assert.equal(lint('popen("ls -la", "r");', matcher).length, 0, 'static string must not be flagged');
 });
 
-test('no-unsafe-shell: flags bare variable in system', () => {
-  const { matcher } = loadRule('no-unsafe-shell');
+// ---------------------------------------------------------------------------
+// no-unsafe-system
+// system() has a safe array form — only flag string-based dynamic calls
+// ---------------------------------------------------------------------------
+
+test('no-unsafe-system: flags bare variable', () => {
+  const { matcher } = loadRule('no-unsafe-system');
   assert.ok(lint('system(cmd);', matcher).length > 0);
 });
 
-test('no-unsafe-shell: does not flag static string in system', () => {
-  const { matcher } = loadRule('no-unsafe-shell');
+test('no-unsafe-system: flags template literal', () => {
+  const { matcher } = loadRule('no-unsafe-system');
+  assert.ok(lint('system(`rm -rf ${path}`);', matcher).length > 0);
+});
+
+test('no-unsafe-system: flags function call result', () => {
+  const { matcher } = loadRule('no-unsafe-system');
+  assert.ok(lint('system(buildCmd());', matcher).length > 0);
+});
+
+test('no-unsafe-system: does not flag static string', () => {
+  const { matcher } = loadRule('no-unsafe-system');
   assert.equal(lint('system("ls");', matcher).length, 0);
+});
+
+test('no-unsafe-system: does not flag array literal (safe argv form)', () => {
+  const { matcher } = loadRule('no-unsafe-system');
+  assert.equal(
+    lint('system(["/bin/ls", dir]);', matcher).length, 0,
+    'system([...]) is safe and must not be flagged'
+  );
 });
 
 // ---------------------------------------------------------------------------
