@@ -181,6 +181,38 @@ message: missing rule field
   assert.equal(result, null);
 });
 
+test('returns null when id field is absent', () => {
+  const result = parseRule(`
+severity: error
+message: no id here
+rule:
+  kind: ERROR
+`);
+  assert.equal(result, null, 'a rule without an id must be rejected, not produce (null) in output');
+});
+
+test('returns null when id field is empty string', () => {
+  const result = parseRule(`
+id: ""
+severity: error
+message: empty id
+rule:
+  kind: ERROR
+`);
+  assert.equal(result, null);
+});
+
+test('returns null when id field is null', () => {
+  const result = parseRule(`
+id: ~
+severity: error
+message: null id
+rule:
+  kind: ERROR
+`);
+  assert.equal(result, null);
+});
+
 test('returns null for completely invalid YAML', () => {
   const result = parseRule('{ invalid: [yaml: content');
   assert.equal(result, null);

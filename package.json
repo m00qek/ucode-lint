@@ -13,8 +13,7 @@
   "files": [
     "bin/ucode-lint",
     "lib/parse-rule.js",
-    "rules/*.yml",
-    "sgconfig.yml"
+    "rules/*.yml"
   ],
   "dependencies": {
     "@ast-grep/napi": "^0.43.0",

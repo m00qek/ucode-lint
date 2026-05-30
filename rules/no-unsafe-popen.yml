@@ -10,6 +10,8 @@ rule:
   any:
     - pattern: popen($CMD)
     - pattern: popen($CMD, $MODE)
+    - pattern: $OBJ.popen($CMD)
+    - pattern: $OBJ.popen($CMD, $MODE)
 constraints:
   CMD:
     not:

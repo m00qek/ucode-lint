@@ -2,7 +2,7 @@
 
 const { test }    = require('node:test');
 const assert      = require('node:assert/strict');
-const { execFileSync, spawnSync } = require('node:child_process');
+const { spawnSync } = require('node:child_process');
 const path        = require('node:path');
 const fs          = require('node:fs');
 const os          = require('node:os');
@@ -149,5 +149,33 @@ test('handles symlink cycle without crashing', () => {
     assert.equal(status, 0);
   } finally {
     fs.rmSync(dir, { recursive: true });
+  }
+});
+
+// ---------------------------------------------------------------------------
+// Unreadable directory (EACCES) — must not crash
+// ---------------------------------------------------------------------------
+
+test('unreadable subdirectory prints a message and continues without crashing', () => {
+  // Skip if running as root (root ignores directory permissions)
+  if (process.getuid && process.getuid() === 0) return;
+
+  const outer = fs.mkdtempSync(path.join(os.tmpdir(), 'ucode-lint-'));
+  const inner = path.join(outer, 'secret');
+  const file  = path.join(outer, 'clean.uc');
+  fs.mkdirSync(inner);
+  fs.writeFileSync(file, 'let x = 1;\n');
+  fs.chmodSync(inner, 0o000);   // no read, no execute
+
+  try {
+    const { status, stderr } = run([outer], { timeout: 5000 });
+    assert.ok(
+      stderr.includes('EACCES') || stderr.includes('permission denied'),
+      'must report the permission error to stderr'
+    );
+    assert.equal(status, 0, 'permission error on a subdir must not make the linter exit 1');
+  } finally {
+    fs.chmodSync(inner, 0o700);
+    fs.rmSync(outer, { recursive: true });
   }
 });

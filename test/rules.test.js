@@ -90,6 +90,21 @@ test('no-unsafe-popen: does not flag static string literal', () => {
   assert.equal(lint('popen("ls -la", "r");', matcher).length, 0, 'static string must not be flagged');
 });
 
+test('no-unsafe-popen: flags fs.popen(cmd) member-call form (one arg)', () => {
+  const { matcher } = loadRule('no-unsafe-popen');
+  assert.ok(lint('fs.popen(cmd);', matcher).length > 0, 'fs.popen(cmd) must be flagged');
+});
+
+test('no-unsafe-popen: flags fs.popen(cmd, mode) member-call form (two args)', () => {
+  const { matcher } = loadRule('no-unsafe-popen');
+  assert.ok(lint('fs.popen(cmd, "r");', matcher).length > 0, 'fs.popen(cmd, "r") must be flagged');
+});
+
+test('no-unsafe-popen: does not flag fs.popen with static string', () => {
+  const { matcher } = loadRule('no-unsafe-popen');
+  assert.equal(lint('fs.popen("ls", "r");', matcher).length, 0, 'fs.popen("static") must not be flagged');
+});
+
 // ---------------------------------------------------------------------------
 // no-unsafe-system
 // system() has a safe array form — only flag string-based dynamic calls
@@ -145,6 +160,16 @@ test('no-assignment-in-condition: passes strict equality in if', () => {
 test('no-assignment-in-condition: passes assignment in body (not condition)', () => {
   const { matcher } = loadRule('no-assignment-in-condition');
   assert.equal(lint('if (x > 0) { x = 1; }', matcher).length, 0);
+});
+
+test('no-assignment-in-condition: flags assignment in ternary condition', () => {
+  const { matcher } = loadRule('no-assignment-in-condition');
+  assert.ok(lint('let r = (x = lookup()) ? x : 0;', matcher).length > 0, 'ternary condition assignment must be flagged');
+});
+
+test('no-assignment-in-condition: passes normal ternary with no assignment', () => {
+  const { matcher } = loadRule('no-assignment-in-condition');
+  assert.equal(lint('let r = x > 0 ? a : b;', matcher).length, 0);
 });
 
 // ---------------------------------------------------------------------------

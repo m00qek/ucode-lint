@@ -7,3 +7,4 @@ rule:
   any:
     - pattern: if ($X = $Y) $BODY
     - pattern: while ($X = $Y) $BODY
+    - pattern: "($X = $Y) ? $THEN : $ELSE"

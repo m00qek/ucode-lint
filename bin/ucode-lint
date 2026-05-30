@@ -105,8 +105,14 @@ function collectFiles(target, visited = new Set()) {
     if (visited.has(realPath)) return [];
     visited.add(realPath);
 
-    return fs.readdirSync(target, { withFileTypes: true })
-      .flatMap(e => collectFiles(path.join(target, e.name), visited));
+    let entries;
+    try {
+      entries = fs.readdirSync(target, { withFileTypes: true });
+    } catch (err) {
+      console.error(`ucode-lint: ${err.message}`);
+      return [];
+    }
+    return entries.flatMap(e => collectFiles(path.join(target, e.name), visited));
   }
 
   return [];
