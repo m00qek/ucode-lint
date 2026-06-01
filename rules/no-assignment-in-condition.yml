@@ -5,13 +5,16 @@ message: >
   Assignment inside a condition is almost certainly a bug — use `===` to
   compare, or move the assignment before the condition.
 rule:
-  any:
-    - pattern: if ($X = $Y) $BODY
-    - pattern: while ($X = $Y) $BODY
-    - pattern: "($X = $Y) ? $THEN : $ELSE"
-    - all:
-        - kind: assignment_expression
-        - inside:
-            kind: for_statement
-            field: condition
-            stopBy: neighbor
+  all:
+    - kind: assignment_expression
+    - inside:
+        any:
+          - kind: if_statement
+          - kind: while_statement
+          - kind: ternary_expression
+          - kind: for_statement
+        field: condition
+        stopBy:
+          any:
+            - kind: function_expression
+            - kind: arrow_function

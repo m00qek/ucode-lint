@@ -192,6 +192,36 @@ test('no-assignment-in-condition: passes assignment in for-loop body', () => {
   assert.equal(lint('for (let i = 0; i < 10; i++) { x = 1; }', matcher).length, 0);
 });
 
+test('no-assignment-in-condition: flags assignment nested in if condition via &&', () => {
+  const { matcher } = loadRule('no-assignment-in-condition');
+  assert.ok(lint('if (a && (x = 1)) {}', matcher).length > 0, 'nested && assignment must be flagged');
+});
+
+test('no-assignment-in-condition: flags assignment nested in if condition via ||', () => {
+  const { matcher } = loadRule('no-assignment-in-condition');
+  assert.ok(lint('if (a || (x = fn())) {}', matcher).length > 0, 'nested || assignment must be flagged');
+});
+
+test('no-assignment-in-condition: flags assignment nested in while condition', () => {
+  const { matcher } = loadRule('no-assignment-in-condition');
+  assert.ok(lint('while (a && (x = fn())) {}', matcher).length > 0, 'nested while assignment must be flagged');
+});
+
+test('no-assignment-in-condition: flags nested assignment in for-loop condition', () => {
+  const { matcher } = loadRule('no-assignment-in-condition');
+  assert.ok(lint('for (let i = 0; ok && (i = fn()); i++) {}', matcher).length > 0, 'nested for-condition assignment must be flagged');
+});
+
+test('no-assignment-in-condition: does not flag assignment inside callback in if condition', () => {
+  const { matcher } = loadRule('no-assignment-in-condition');
+  assert.equal(lint('if (arr.filter(function(x) { return x = 1; }).length) {}', matcher).length, 0, 'callback body must not be flagged');
+});
+
+test('no-assignment-in-condition: does not flag assignment inside arrow function in if condition', () => {
+  const { matcher } = loadRule('no-assignment-in-condition');
+  assert.equal(lint('if (arr.map(x => x = fn()).length) {}', matcher).length, 0, 'arrow fn body must not be flagged');
+});
+
 // ---------------------------------------------------------------------------
 // prefer-strict-equality
 // ---------------------------------------------------------------------------
