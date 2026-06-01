@@ -29,8 +29,10 @@ jobs:
       - name: Generate registry.json
         run: node scripts/generate-registry.js
 
-      - name: Zip registry
-        run: zip registry.json.zip registry.json
+      - name: Zip registry and generate checksums
+        run: |
+          zip registry.json.zip registry.json
+          sha256sum registry.json.zip > checksums.txt
 
       - name: Publish release
         env:
@@ -40,4 +42,4 @@ jobs:
           gh release create registry-v1 \
             --title "Mason Registry" \
             --notes "Auto-generated mason registry. Do not edit manually." \
-            registry.json.zip
+            registry.json.zip checksums.txt
