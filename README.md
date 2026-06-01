@@ -44,7 +44,7 @@ Exit code `1` if one or more errors are found.
 | ID | Severity | Category | Description |
 |----|----------|----------|-------------|
 | `no-error-nodes` | error | Removed JS syntax | Flags any construct ucode cannot parse: `var`, `new`, `throw`, `typeof`, `class`, destructuring (array and object), `for...of`, `async`/`await`, `>>>` |
-| `no-export-default-expression` | error | Ucode-specific | `export default function() {}` requires a trailing `;` — unlike JS, `default` always takes an expression, not a declaration |
+| `no-export-default-expression` | error | Ucode-specific | `export default <expr>` always requires a trailing `;` — unlike JS, ucode has no ASI after `export default`, so omitting the semicolon is a syntax error for any expression (functions, arrows, literals, identifiers) |
 | `no-assignment-in-condition` | error | Common bugs | Assignment inside an `if`, `while`, `for`, or ternary condition — use `===` to compare, or move the assignment before the condition |
 | `no-eval` | error | Security | `eval()` executes arbitrary code |
 | `no-unsafe-popen` | error | Security | `popen()` always runs its argument through `/bin/sh` and has no array form — sanitize inputs or replace with `system([...])` |
