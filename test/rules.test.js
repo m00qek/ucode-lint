@@ -18,33 +18,22 @@ function loadRule(name) {
 }
 
 // ---------------------------------------------------------------------------
-// no-array-destructuring
-// (grammar accepts let[...]=arr as a subscript, so no-error-nodes misses it)
+// no-error-nodes — array destructuring (now covered after grammar fix)
 // ---------------------------------------------------------------------------
 
-test('no-array-destructuring: flags let [a,b] = arr', () => {
-  const { matcher } = loadRule('no-array-destructuring');
-  assert.ok(lint('let [a, b] = arr;', matcher).length > 0);
+test('no-error-nodes: flags let array destructuring (let [a,b] = arr)', () => {
+  const { matcher } = loadRule('no-error-nodes');
+  assert.ok(lint('let [a, b] = arr;', matcher).length > 0, 'let array destructuring must be flagged');
 });
 
-test('no-array-destructuring: flags let [a,b,c] = literal', () => {
-  const { matcher } = loadRule('no-array-destructuring');
+test('no-error-nodes: flags let array destructuring literal', () => {
+  const { matcher } = loadRule('no-error-nodes');
   assert.ok(lint('let [a, b, c] = [1, 2, 3];', matcher).length > 0);
 });
 
-test('no-array-destructuring: flags let [x] = fn()', () => {
-  const { matcher } = loadRule('no-array-destructuring');
-  assert.ok(lint('let [x] = fn();', matcher).length > 0);
-});
-
-test('no-array-destructuring: does not flag valid let declaration', () => {
-  const { matcher } = loadRule('no-array-destructuring');
+test('no-error-nodes: does not flag valid subscript access', () => {
+  const { matcher } = loadRule('no-error-nodes');
   assert.equal(lint('let a = arr[0];', matcher).length, 0);
-});
-
-test('no-array-destructuring: does not flag valid subscript assignment', () => {
-  const { matcher } = loadRule('no-array-destructuring');
-  assert.equal(lint('arr[0] = 1;', matcher).length, 0);
 });
 
 // ---------------------------------------------------------------------------

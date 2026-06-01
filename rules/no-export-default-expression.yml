@@ -11,5 +11,4 @@ rule:
     - has:
         kind: function_expression
     - not:
-        has:
-          pattern: ;
+        regex: ;$
