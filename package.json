@@ -29,7 +29,7 @@
   "dependencies": {
     "@ast-grep/napi": "^0.43.0",
     "node-gyp-build": "^4.8.4",
-    "tree-sitter-ucode": "^0.1.2",
+    "tree-sitter-ucode": "^0.2.0",
     "yaml": "^2.9.0"
   },
   "optionalDependencies": {

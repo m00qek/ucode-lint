@@ -6,9 +6,15 @@ message: >
   required. Unlike JS, `export default function() {}` is not treated as a
   declaration — omitting the semicolon is a syntax error.
 rule:
-  all:
-    - kind: export_statement
-    - has:
-        kind: function_expression
-    - not:
-        regex: ;$
+  any:
+    - all:
+        - kind: export_statement
+        - has:
+            kind: function_expression
+        - not:
+            regex: ;$
+    - all:
+        - kind: ERROR
+        - has:
+            kind: arrow_function
+        - regex: "^export\\s+default\\s+"

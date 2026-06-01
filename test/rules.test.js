@@ -60,6 +60,16 @@ test('no-export-default-expression: does not flag named export (no default)', ()
   assert.equal(lint('export function foo() {}', matcher).length, 0);
 });
 
+test('no-export-default-expression: flags arrow function without semicolon', () => {
+  const { matcher } = loadRule('no-export-default-expression');
+  assert.ok(lint('export default (x) => x', matcher).length > 0);
+});
+
+test('no-export-default-expression: passes arrow function with trailing semicolon', () => {
+  const { matcher } = loadRule('no-export-default-expression');
+  assert.equal(lint('export default (x) => x;', matcher).length, 0);
+});
+
 // ---------------------------------------------------------------------------
 // no-error-nodes
 // ---------------------------------------------------------------------------
