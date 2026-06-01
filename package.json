@@ -17,7 +17,7 @@
     "ucode-lint": "bin/ucode-lint"
   },
   "scripts": {
-    "test": "node --test 'test/**/*.test.js'"
+    "test": "node --test test/cli.test.js test/parse-rule.test.js test/rules.test.js"
   },
   "files": [
     "bin/ucode-lint",
