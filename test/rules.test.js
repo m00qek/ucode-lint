@@ -158,6 +158,16 @@ test('no-unsafe-popen: does not flag static string literal', () => {
   assert.equal(lint('popen("ls -la", "r");', matcher).length, 0, 'static string must not be flagged');
 });
 
+test('no-unsafe-popen: does not flag static template literal (no interpolation)', () => {
+  const { matcher } = loadRule('no-unsafe-popen');
+  assert.equal(lint('popen(`ls -la`, "r");', matcher).length, 0, 'static template must not be flagged');
+});
+
+test('no-unsafe-popen: flags template literal with interpolation', () => {
+  const { matcher } = loadRule('no-unsafe-popen');
+  assert.ok(lint('popen(`ls ${dir}`, "r");', matcher).length > 0, 'interpolated template must be flagged');
+});
+
 test('no-unsafe-popen: flags fs.popen(cmd) member-call form (one arg)', () => {
   const { matcher } = loadRule('no-unsafe-popen');
   assert.ok(lint('fs.popen(cmd);', matcher).length > 0, 'fs.popen(cmd) must be flagged');
@@ -196,6 +206,16 @@ test('no-unsafe-system: flags function call result', () => {
 test('no-unsafe-system: does not flag static string', () => {
   const { matcher } = loadRule('no-unsafe-system');
   assert.equal(lint('system("ls");', matcher).length, 0);
+});
+
+test('no-unsafe-system: does not flag static template literal (no interpolation)', () => {
+  const { matcher } = loadRule('no-unsafe-system');
+  assert.equal(lint('system(`ls`);', matcher).length, 0, 'static template must not be flagged');
+});
+
+test('no-unsafe-system: flags template literal with interpolation', () => {
+  const { matcher } = loadRule('no-unsafe-system');
+  assert.ok(lint('system(`rm -rf ${path}`);', matcher).length > 0, 'interpolated template must be flagged');
 });
 
 test('no-unsafe-system: does not flag array literal (safe argv form)', () => {

@@ -129,18 +129,35 @@ for (const file of files) {
   const src      = fs.readFileSync(file, 'utf8');
   const rootNode = sg.parse('ucode', src).root();
 
+  // Collect all matches for this file first so we can deduplicate.
+  const fileMatches = [];
   for (const rule of rules) {
-    const matches = rootNode.findAll(rule.matcher);
-    for (const node of matches) {
+    for (const node of rootNode.findAll(rule.matcher)) {
       const { start } = node.range();
-      const severity  = rule.severity;
-      console.log(
-        `${file}:${start.line + 1}:${start.column + 1}: ` +
-        `[${severity}] ${rule.message} (${rule.id})`
-      );
-      if (severity === 'error') errorCount++;
-      else warningCount++;
+      fileMatches.push({ rule, line: start.line, col: start.column });
     }
+  }
+
+  // When a specific rule already fires at a position, suppress no-error-nodes
+  // there — it would only add generic noise on top of the actionable message.
+  const coveredBySpecific = new Set(
+    fileMatches
+      .filter(m => m.rule.id !== 'no-error-nodes')
+      .map(m => `${m.line}:${m.col}`)
+  );
+
+  // Sort by position for deterministic, readable output.
+  fileMatches.sort((a, b) => a.line - b.line || a.col - b.col);
+
+  for (const { rule, line, col } of fileMatches) {
+    if (rule.id === 'no-error-nodes' && coveredBySpecific.has(`${line}:${col}`)) continue;
+    const severity = rule.severity;
+    console.log(
+      `${file}:${line + 1}:${col + 1}: ` +
+      `[${severity}] ${rule.message} (${rule.id})`
+    );
+    if (severity === 'error') errorCount++;
+    else warningCount++;
   }
 }
 

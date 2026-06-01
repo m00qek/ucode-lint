@@ -16,3 +16,8 @@ constraints:
       any:
         - kind: string
         - kind: array
+        - all:
+            - kind: template_string
+            - not:
+                has:
+                  kind: template_substitution

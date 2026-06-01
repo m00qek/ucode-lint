@@ -15,4 +15,10 @@ rule:
 constraints:
   CMD:
     not:
-      kind: string
+      any:
+        - kind: string
+        - all:
+            - kind: template_string
+            - not:
+                has:
+                  kind: template_substitution

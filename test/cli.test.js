@@ -120,6 +120,25 @@ test('exits 0 for warnings-only file', () => {
 });
 
 // ---------------------------------------------------------------------------
+// no-error-nodes deduplication
+// ---------------------------------------------------------------------------
+
+test('no-error-nodes is suppressed when a specific rule covers the same position', () => {
+  const dir  = fs.mkdtempSync(path.join(os.tmpdir(), 'ucode-lint-'));
+  const file = path.join(dir, 'ded.uc');
+  // export default arrow without semicolon fires both no-error-nodes and
+  // no-export-default-expression; only the specific rule should appear.
+  fs.writeFileSync(file, 'export default (x) => x\n');
+  try {
+    const { stdout } = run([file]);
+    assert.ok(stdout.includes('no-export-default-expression'), 'specific rule must fire');
+    assert.ok(!stdout.includes('no-error-nodes'), 'no-error-nodes must be suppressed');
+  } finally {
+    fs.rmSync(dir, { recursive: true });
+  }
+});
+
+// ---------------------------------------------------------------------------
 // No .uc files found
 // ---------------------------------------------------------------------------
 
