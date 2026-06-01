@@ -7,7 +7,9 @@ message: >
   system(["/path/to/cmd", arg1, arg2]) executes without a shell and is safe
   even with untrusted arguments.
 rule:
-  pattern: system($CMD)
+  any:
+    - pattern: system($CMD)
+    - pattern: system($CMD, $TIMEOUT)
 constraints:
   CMD:
     not:

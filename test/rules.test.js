@@ -70,6 +70,21 @@ test('no-export-default-expression: passes arrow function with trailing semicolo
   assert.equal(lint('export default (x) => x;', matcher).length, 0);
 });
 
+test('no-export-default-expression: flags number literal without semicolon', () => {
+  const { matcher } = loadRule('no-export-default-expression');
+  assert.ok(lint('export default 42', matcher).length > 0);
+});
+
+test('no-export-default-expression: flags identifier without semicolon', () => {
+  const { matcher } = loadRule('no-export-default-expression');
+  assert.ok(lint('export default obj', matcher).length > 0);
+});
+
+test('no-export-default-expression: passes number literal with trailing semicolon', () => {
+  const { matcher } = loadRule('no-export-default-expression');
+  assert.equal(lint('export default 42;', matcher).length, 0);
+});
+
 // ---------------------------------------------------------------------------
 // no-error-nodes
 // ---------------------------------------------------------------------------
@@ -194,6 +209,21 @@ test('no-unsafe-system: does not flag array literal (safe argv form)', () => {
 test('no-unsafe-system: flags string concatenation', () => {
   const { matcher } = loadRule('no-unsafe-system');
   assert.ok(lint('system("rm -rf " + path);', matcher).length > 0, 'string concatenation must be flagged');
+});
+
+test('no-unsafe-system: flags dynamic string with timeout argument', () => {
+  const { matcher } = loadRule('no-unsafe-system');
+  assert.ok(lint('system(cmd, 5);', matcher).length > 0, 'two-arg form with dynamic cmd must be flagged');
+});
+
+test('no-unsafe-system: does not flag static string with timeout argument', () => {
+  const { matcher } = loadRule('no-unsafe-system');
+  assert.equal(lint('system("ls", 5);', matcher).length, 0);
+});
+
+test('no-unsafe-system: does not flag array form with timeout argument', () => {
+  const { matcher } = loadRule('no-unsafe-system');
+  assert.equal(lint('system(["/bin/ls", dir], 5);', matcher).length, 0);
 });
 
 // ---------------------------------------------------------------------------

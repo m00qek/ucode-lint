@@ -9,8 +9,7 @@ rule:
   any:
     - all:
         - kind: export_statement
-        - has:
-            kind: function_expression
+        - regex: "^export\\s+default\\s+"
         - not:
             regex: ;$
     - all:
