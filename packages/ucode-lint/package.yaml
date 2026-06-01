@@ -1,0 +1,14 @@
+---
+name: ucode-lint
+description: Static linter for ucode, the OpenWrt scripting language used in OpenWrt.
+homepage: https://github.com/m00qek/ucode-lint
+licenses:
+  - MIT
+languages:
+  - ucode
+categories:
+  - Linter
+source:
+  id: pkg:npm/ucode-lint@0.1.0
+bin:
+  ucode-lint: npm:ucode-lint
