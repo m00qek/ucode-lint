@@ -1,17 +1,9 @@
 'use strict';
 
-const path = require('node:path');
-const sg   = require('@ast-grep/napi');
+const sg = require('@ast-grep/napi');
+const { registerUcodeGrammar } = require('../../lib/load-grammar');
 
-const grammarDir = path.dirname(
-  require.resolve('tree-sitter-ucode/package.json')
-);
-sg.registerDynamicLanguage({
-  ucode: {
-    libraryPath: path.join(grammarDir, 'ucode.so'),
-    extensions:  ['uc'],
-  },
-});
+registerUcodeGrammar(sg);
 
 function lint(src, matcher) {
   return sg.parse('ucode', src).root().findAll(matcher);

@@ -2,7 +2,13 @@
   "name": "ucode-lint",
   "version": "0.1.0",
   "description": "Lint rules for ucode, the OpenWrt scripting language",
-  "keywords": ["ucode", "openwrt", "linter", "ast-grep", "static-analysis"],
+  "keywords": [
+    "ucode",
+    "openwrt",
+    "linter",
+    "ast-grep",
+    "static-analysis"
+  ],
   "homepage": "https://github.com/m00qek/ucode-lint#readme",
   "bugs": "https://github.com/m00qek/ucode-lint/issues",
   "repository": "https://github.com/m00qek/ucode-lint",
@@ -15,13 +21,15 @@
   },
   "files": [
     "bin/ucode-lint",
+    "lib/load-grammar.js",
     "lib/parse-rule.js",
     "rules/*.yml",
     "LICENSE"
   ],
   "dependencies": {
     "@ast-grep/napi": "^0.43.0",
-    "tree-sitter-ucode": "file:../tree-sitter-ucode",
+    "node-gyp-build": "^4.8.4",
+    "tree-sitter-ucode": "^0.1.2",
     "yaml": "^2.9.0"
   },
   "optionalDependencies": {
@@ -38,6 +46,6 @@
     "node": ">=18"
   },
   "allowScripts": {
-    "file:../../tree-sitter-ucode": true
+    "tree-sitter-ucode": true
   }
 }

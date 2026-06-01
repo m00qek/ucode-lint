@@ -3,7 +3,8 @@
 
 const path = require('node:path');
 const fs   = require('node:fs');
-const { parseRule } = require('../lib/parse-rule');
+const { parseRule }          = require('../lib/parse-rule');
+const { registerUcodeGrammar } = require('../lib/load-grammar');
 
 // ---------------------------------------------------------------------------
 // --help (before any I/O so a broken install still prints usage)
@@ -50,18 +51,11 @@ try {
 }
 
 try {
-  const grammarDir = path.dirname(require.resolve('tree-sitter-ucode/package.json'));
-  sg.registerDynamicLanguage({
-    ucode: {
-      libraryPath: path.join(grammarDir, 'ucode.so'),
-      extensions:  ['uc'],
-    },
-  });
+  registerUcodeGrammar(sg);
 } catch (err) {
   console.error(
     'ucode-lint: could not load the ucode grammar.\n' +
-    'Make sure tree-sitter-ucode is installed and the grammar has been built:\n' +
-    '  cd node_modules/tree-sitter-ucode && tree-sitter build\n' +
+    'Make sure tree-sitter-ucode is installed correctly.\n' +
     `Details: ${err.message}`
   );
   process.exit(1);
@@ -132,11 +126,11 @@ let errorCount   = 0;
 let warningCount = 0;
 
 for (const file of files) {
-  const src  = fs.readFileSync(file, 'utf8');
-  const root = sg.parse('ucode', src);
+  const src      = fs.readFileSync(file, 'utf8');
+  const rootNode = sg.parse('ucode', src).root();
 
   for (const rule of rules) {
-    const matches = root.root().findAll(rule.matcher);
+    const matches = rootNode.findAll(rule.matcher);
     for (const node of matches) {
       const { start } = node.range();
       const severity  = rule.severity;
