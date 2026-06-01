@@ -176,6 +176,8 @@ test('handles symlink cycle without crashing', () => {
 // ---------------------------------------------------------------------------
 
 test('unreadable subdirectory prints a message and continues without crashing', () => {
+  // Windows does not honour Unix-style chmod — skip
+  if (process.platform === 'win32') return;
   // Skip if running as root (root ignores directory permissions)
   if (process.getuid && process.getuid() === 0) return;
 
