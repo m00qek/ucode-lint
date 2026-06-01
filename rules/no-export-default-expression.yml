@@ -1,0 +1,15 @@
+id: no-export-default-expression
+language: ucode
+severity: error
+message: >
+  `export default` always takes an expression in ucode, so a trailing `;` is
+  required. Unlike JS, `export default function() {}` is not treated as a
+  declaration — omitting the semicolon is a syntax error.
+rule:
+  all:
+    - kind: export_statement
+    - has:
+        kind: function_expression
+    - not:
+        has:
+          pattern: ;

@@ -18,6 +18,60 @@ function loadRule(name) {
 }
 
 // ---------------------------------------------------------------------------
+// no-array-destructuring
+// (grammar accepts let[...]=arr as a subscript, so no-error-nodes misses it)
+// ---------------------------------------------------------------------------
+
+test('no-array-destructuring: flags let [a,b] = arr', () => {
+  const { matcher } = loadRule('no-array-destructuring');
+  assert.ok(lint('let [a, b] = arr;', matcher).length > 0);
+});
+
+test('no-array-destructuring: flags let [a,b,c] = literal', () => {
+  const { matcher } = loadRule('no-array-destructuring');
+  assert.ok(lint('let [a, b, c] = [1, 2, 3];', matcher).length > 0);
+});
+
+test('no-array-destructuring: flags let [x] = fn()', () => {
+  const { matcher } = loadRule('no-array-destructuring');
+  assert.ok(lint('let [x] = fn();', matcher).length > 0);
+});
+
+test('no-array-destructuring: does not flag valid let declaration', () => {
+  const { matcher } = loadRule('no-array-destructuring');
+  assert.equal(lint('let a = arr[0];', matcher).length, 0);
+});
+
+test('no-array-destructuring: does not flag valid subscript assignment', () => {
+  const { matcher } = loadRule('no-array-destructuring');
+  assert.equal(lint('arr[0] = 1;', matcher).length, 0);
+});
+
+// ---------------------------------------------------------------------------
+// no-export-default-expression
+// ---------------------------------------------------------------------------
+
+test('no-export-default-expression: flags anonymous function without semicolon', () => {
+  const { matcher } = loadRule('no-export-default-expression');
+  assert.ok(lint('export default function() {}', matcher).length > 0);
+});
+
+test('no-export-default-expression: flags named function without semicolon', () => {
+  const { matcher } = loadRule('no-export-default-expression');
+  assert.ok(lint('export default function foo() {}', matcher).length > 0);
+});
+
+test('no-export-default-expression: passes function with trailing semicolon', () => {
+  const { matcher } = loadRule('no-export-default-expression');
+  assert.equal(lint('export default function() {};', matcher).length, 0);
+});
+
+test('no-export-default-expression: does not flag named export (no default)', () => {
+  const { matcher } = loadRule('no-export-default-expression');
+  assert.equal(lint('export function foo() {}', matcher).length, 0);
+});
+
+// ---------------------------------------------------------------------------
 // no-error-nodes
 // ---------------------------------------------------------------------------
 
